@@ -52,6 +52,8 @@ La API pública no requiere clave. La configuración y las credenciales se manti
 ## Inicio rápido en Windows
 
 ```powershell
+git clone https://github.com/OleOle19/peru-seismic-analytics.git
+cd peru-seismic-analytics
 ./Instalar.ps1
 ./Actualizar-Datos.ps1 -Desde 2021-01-01 -Hasta 2026-10-12
 ./Abrir-Dashboard.ps1
