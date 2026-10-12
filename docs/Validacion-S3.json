@@ -1,0 +1,8 @@
+{
+  "verified_files": 14,
+  "bytes": 3424675,
+  "sha256_match": true,
+  "encryption": "SSE-S3",
+  "region": "us-east-2",
+  "validated_local_date": "2026-10-11"
+}

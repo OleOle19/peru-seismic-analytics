@@ -1,0 +1,13 @@
+.venv/
+.env
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.log
+**/.pbi/
+data/raw/
+data/processed/
+data/staging/
+docs/Preparacion.md
+artifacts/
+!artifacts/.gitkeep

@@ -1,0 +1,526 @@
+{
+  "name": "PeruSeismicAnalytics",
+  "compatibilityLevel": 1601,
+  "model": {
+    "culture": "es-PE",
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-US",
+    "tables": [
+      {
+        "name": "Eventos",
+        "columns": [
+          {
+            "name": "event_id",
+            "dataType": "string",
+            "sourceColumn": "event_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "time_utc",
+            "dataType": "dateTime",
+            "sourceColumn": "time_utc",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd HH:mm:ss"
+          },
+          {
+            "name": "date_key",
+            "dataType": "int64",
+            "sourceColumn": "date_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "latitude",
+            "dataType": "double",
+            "sourceColumn": "latitude",
+            "summarizeBy": "none",
+            "dataCategory": "Latitude"
+          },
+          {
+            "name": "longitude",
+            "dataType": "double",
+            "sourceColumn": "longitude",
+            "summarizeBy": "none",
+            "dataCategory": "Longitude"
+          },
+          {
+            "name": "depth_km",
+            "dataType": "double",
+            "sourceColumn": "depth_km",
+            "summarizeBy": "none",
+            "formatString": "0.0"
+          },
+          {
+            "name": "magnitude",
+            "dataType": "double",
+            "sourceColumn": "magnitude",
+            "summarizeBy": "none",
+            "formatString": "0.0"
+          },
+          {
+            "name": "magnitude_type",
+            "dataType": "string",
+            "sourceColumn": "magnitude_type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "zone_key",
+            "dataType": "int64",
+            "sourceColumn": "zone_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "magnitude_key",
+            "dataType": "int64",
+            "sourceColumn": "magnitude_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "depth_band",
+            "dataType": "string",
+            "sourceColumn": "depth_band",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "place",
+            "dataType": "string",
+            "sourceColumn": "place",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "status",
+            "dataType": "string",
+            "sourceColumn": "status",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "updated_utc",
+            "dataType": "dateTime",
+            "sourceColumn": "updated_utc",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd HH:mm:ss"
+          },
+          {
+            "name": "source_url",
+            "dataType": "string",
+            "sourceColumn": "source_url",
+            "summarizeBy": "none",
+            "dataCategory": "WebUrl"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Eventos",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"localhost\", \"SeismicAnalytics\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"dbo\",Item=\"FactEvent\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Eventos registrados",
+            "expression": "COALESCE(COUNTROWS(Eventos),0)",
+            "formatString": "#,0",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Magnitud máxima",
+            "expression": "MAX(Eventos[magnitude])",
+            "formatString": "0.0",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Magnitud media",
+            "expression": "AVERAGE(Eventos[magnitude])",
+            "formatString": "0.00",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Profundidad media (km)",
+            "expression": "AVERAGE(Eventos[depth_km])",
+            "formatString": "0.0",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Eventos M5+",
+            "expression": "COALESCE(CALCULATE(COUNTROWS(Eventos),KEEPFILTERS(Eventos[magnitude]>=5)),0)",
+            "formatString": "#,0",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Porcentaje superficiales",
+            "expression": "DIVIDE(CALCULATE(COUNTROWS(Eventos),KEEPFILTERS(Eventos[depth_km]<70)),COUNTROWS(Eventos))",
+            "formatString": "0.0%",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Eventos mes anterior",
+            "expression": "CALCULATE([Eventos registrados],DATEADD(Calendario[date],-1,MONTH))",
+            "formatString": "#,0",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Variación mensual",
+            "expression": "DIVIDE([Eventos registrados]-[Eventos mes anterior],[Eventos mes anterior])",
+            "formatString": "0.0%",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Eventos año anterior",
+            "expression": "CALCULATE([Eventos registrados],DATEADD(Calendario[date],-1,YEAR))",
+            "formatString": "#,0",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Fecha último evento",
+            "expression": "MAX(Eventos[time_utc])",
+            "formatString": "dd/MM/yyyy HH:mm",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Título panorama",
+            "expression": "\"PERÚ Y ENTORNO | Sismicidad\"",
+            "displayFolder": "Contexto"
+          },
+          {
+            "name": "Título distribución",
+            "expression": "\"DISTRIBUCIÓN | Magnitud y profundidad\"",
+            "displayFolder": "Contexto"
+          },
+          {
+            "name": "Título calidad",
+            "expression": "\"DATOS | Trazabilidad y calidad\"",
+            "displayFolder": "Contexto"
+          },
+          {
+            "name": "Alcance",
+            "expression": "VAR Ultima = TOPN(1,ALL(Ejecuciones),Ejecuciones[completed_utc],DESC) RETURN \"USGS · M ≥\" & FORMAT(MAXX(Ultima,Ejecuciones[min_magnitude]),\"0.0\") & \" · \" & FORMAT(MAXX(Ultima,Ejecuciones[start_date]),\"yyyy-MM-dd\") & \" a \" & FORMAT(MAXX(Ultima,Ejecuciones[end_date])-1,\"yyyy-MM-dd\") & \" · UTC\"",
+            "displayFolder": "Contexto"
+          },
+          {
+            "name": "Nota de alcance",
+            "expression": "[Alcance] & \" | Lat. -20 a 0 / lon. -84 a -68 (mar y países vecinos).\"",
+            "displayFolder": "Contexto"
+          },
+          {
+            "name": "Nota científica",
+            "expression": "\"Análisis descriptivo del catálogo; no predicción ni evaluación de riesgo.\"",
+            "displayFolder": "Contexto"
+          },
+          {
+            "name": "Nota zonas",
+            "expression": "\"Norte/Centro/Sur son bandas latitudinales, no regiones administrativas.\"",
+            "displayFolder": "Contexto"
+          },
+          {
+            "name": "Última extracción",
+            "expression": "MAX(Ejecuciones[completed_utc])",
+            "formatString": "dd/MM/yyyy HH:mm",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Filas recibidas",
+            "expression": "VAR Ultima = TOPN(1,ALL(Ejecuciones),Ejecuciones[completed_utc],DESC) RETURN MAXX(Ultima,Ejecuciones[received])",
+            "formatString": "#,0",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Filas rechazadas",
+            "expression": "VAR Ultima = TOPN(1,ALL(Ejecuciones),Ejecuciones[completed_utc],DESC) RETURN MAXX(Ultima,Ejecuciones[rejected])",
+            "formatString": "#,0",
+            "displayFolder": "Indicadores"
+          },
+          {
+            "name": "Duplicados eliminados",
+            "expression": "VAR Ultima = TOPN(1,ALL(Ejecuciones),Ejecuciones[completed_utc],DESC) RETURN MAXX(Ultima,Ejecuciones[duplicates_removed])",
+            "formatString": "#,0",
+            "displayFolder": "Indicadores"
+          }
+        ]
+      },
+      {
+        "name": "Calendario",
+        "columns": [
+          {
+            "name": "date_key",
+            "dataType": "int64",
+            "sourceColumn": "date_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd",
+            "isKey": true
+          },
+          {
+            "name": "year",
+            "dataType": "int64",
+            "sourceColumn": "year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "year_month",
+            "dataType": "string",
+            "sourceColumn": "year_month",
+            "summarizeBy": "none",
+            "sortByColumn": "month_start"
+          },
+          {
+            "name": "month_start",
+            "dataType": "dateTime",
+            "sourceColumn": "month_start",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Calendario",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"localhost\", \"SeismicAnalytics\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimDate\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ],
+        "dataCategory": "Time"
+      },
+      {
+        "name": "Zona",
+        "columns": [
+          {
+            "name": "zone_key",
+            "dataType": "int64",
+            "sourceColumn": "zone_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "zone",
+            "dataType": "string",
+            "sourceColumn": "zone",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "latitude_min",
+            "dataType": "double",
+            "sourceColumn": "latitude_min",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "latitude_max",
+            "dataType": "double",
+            "sourceColumn": "latitude_max",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Zona",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"localhost\", \"SeismicAnalytics\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimZone\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Magnitud",
+        "columns": [
+          {
+            "name": "magnitude_key",
+            "dataType": "int64",
+            "sourceColumn": "magnitude_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "magnitude_band",
+            "dataType": "string",
+            "sourceColumn": "magnitude_band",
+            "summarizeBy": "none",
+            "sortByColumn": "magnitude_key"
+          },
+          {
+            "name": "magnitude_min",
+            "dataType": "double",
+            "sourceColumn": "magnitude_min",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "magnitude_max",
+            "dataType": "double",
+            "sourceColumn": "magnitude_max",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Magnitud",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"localhost\", \"SeismicAnalytics\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimMagnitude\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Ejecuciones",
+        "columns": [
+          {
+            "name": "run_id",
+            "dataType": "string",
+            "sourceColumn": "run_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "completed_utc",
+            "dataType": "dateTime",
+            "sourceColumn": "completed_utc",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd HH:mm:ss"
+          },
+          {
+            "name": "start_date",
+            "dataType": "dateTime",
+            "sourceColumn": "start_date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "end_date",
+            "dataType": "dateTime",
+            "sourceColumn": "end_date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "min_magnitude",
+            "dataType": "double",
+            "sourceColumn": "min_magnitude",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "received",
+            "dataType": "int64",
+            "sourceColumn": "received",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "loaded",
+            "dataType": "int64",
+            "sourceColumn": "loaded",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "rejected",
+            "dataType": "int64",
+            "sourceColumn": "rejected",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "duplicates_removed",
+            "dataType": "int64",
+            "sourceColumn": "duplicates_removed",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Ejecuciones",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Sql.Database(\"localhost\", \"SeismicAnalytics\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"dbo\",Item=\"ETLRun\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "Eventos_Calendario",
+        "fromTable": "Eventos",
+        "fromColumn": "date_key",
+        "toTable": "Calendario",
+        "toColumn": "date_key",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "Eventos_Zona",
+        "fromTable": "Eventos",
+        "fromColumn": "zone_key",
+        "toTable": "Zona",
+        "toColumn": "zone_key",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "Eventos_Magnitud",
+        "fromTable": "Eventos",
+        "fromColumn": "magnitude_key",
+        "toTable": "Magnitud",
+        "toColumn": "magnitude_key",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      }
+    ]
+  }
+}

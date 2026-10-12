@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Seismic"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "dbca378c-b36d-4d9f-8776-0ca1f2c8f7dd"
+  }
+}

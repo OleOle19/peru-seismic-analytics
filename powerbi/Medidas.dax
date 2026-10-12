@@ -1,0 +1,62 @@
+Eventos registrados =
+COALESCE(COUNTROWS(Eventos),0)
+
+Magnitud máxima =
+MAX(Eventos[magnitude])
+
+Magnitud media =
+AVERAGE(Eventos[magnitude])
+
+Profundidad media (km) =
+AVERAGE(Eventos[depth_km])
+
+Eventos M5+ =
+COALESCE(CALCULATE(COUNTROWS(Eventos),KEEPFILTERS(Eventos[magnitude]>=5)),0)
+
+Porcentaje superficiales =
+DIVIDE(CALCULATE(COUNTROWS(Eventos),KEEPFILTERS(Eventos[depth_km]<70)),COUNTROWS(Eventos))
+
+Eventos mes anterior =
+CALCULATE([Eventos registrados],DATEADD(Calendario[date],-1,MONTH))
+
+Variación mensual =
+DIVIDE([Eventos registrados]-[Eventos mes anterior],[Eventos mes anterior])
+
+Eventos año anterior =
+CALCULATE([Eventos registrados],DATEADD(Calendario[date],-1,YEAR))
+
+Fecha último evento =
+MAX(Eventos[time_utc])
+
+Título panorama =
+"PERÚ Y ENTORNO | Sismicidad"
+
+Título distribución =
+"DISTRIBUCIÓN | Magnitud y profundidad"
+
+Título calidad =
+"DATOS | Trazabilidad y calidad"
+
+Alcance =
+VAR Ultima = TOPN(1,ALL(Ejecuciones),Ejecuciones[completed_utc],DESC) RETURN "USGS · M ≥" & FORMAT(MAXX(Ultima,Ejecuciones[min_magnitude]),"0.0") & " · " & FORMAT(MAXX(Ultima,Ejecuciones[start_date]),"yyyy-MM-dd") & " a " & FORMAT(MAXX(Ultima,Ejecuciones[end_date])-1,"yyyy-MM-dd") & " · UTC"
+
+Nota de alcance =
+[Alcance] & " | Lat. -20 a 0 / lon. -84 a -68 (mar y países vecinos)."
+
+Nota científica =
+"Análisis descriptivo del catálogo; no predicción ni evaluación de riesgo."
+
+Nota zonas =
+"Norte/Centro/Sur son bandas latitudinales, no regiones administrativas."
+
+Última extracción =
+MAX(Ejecuciones[completed_utc])
+
+Filas recibidas =
+VAR Ultima = TOPN(1,ALL(Ejecuciones),Ejecuciones[completed_utc],DESC) RETURN MAXX(Ultima,Ejecuciones[received])
+
+Filas rechazadas =
+VAR Ultima = TOPN(1,ALL(Ejecuciones),Ejecuciones[completed_utc],DESC) RETURN MAXX(Ultima,Ejecuciones[rejected])
+
+Duplicados eliminados =
+VAR Ultima = TOPN(1,ALL(Ejecuciones),Ejecuciones[completed_utc],DESC) RETURN MAXX(Ultima,Ejecuciones[duplicates_removed])
